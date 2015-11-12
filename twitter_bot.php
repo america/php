@@ -18,7 +18,6 @@ class Twitter_Bot{
   var $TO;
   var $times;
 
-
   function Twitter_Bot($usr,$consumer_key,$consumer_secret,$oauth_token,$oauth_token_secret){
     $this->user = $usr;
     $this->TO = new TwitterOAuth($consumer_key,$consumer_secret,$oauth_token,$oauth_token_secret);
@@ -48,19 +47,9 @@ class Twitter_Bot{
    }
    return file($dat);
  }
- // データを書き込む。ここをSQLiteやMySQLなどにデータを保存するように書き換えてもいいかもしれない。
+
+ // DBにデータを書き込む。
  function Save_data($tableName, $sid, $uid, $screen_name, $tweet, $reply, $createdAt){
-  // $dat = $this->user."_".$type.".dat";
-  // if(!file_exists($dat)){
-  //   touch($dat);
-  //   chmod($dat,0666);
-  // }
-  // //$fdat = fopen($dat,"w");
-  // $fdat = fopen($dat,"a");
-  // flock($fdat,LOCK_EX);
-  // fputs($fdat,$data);
-  // flock($fdat,LOCK_UN);
-  // fclose($fdat);
 
    try {
      $dbInfo = getDBInfo();
@@ -70,11 +59,14 @@ class Twitter_Bot{
      $query = $con->prepare($sql);
      $result = $query->execute();
      if(!$result) {
-       print("Execute Failure!\n");
-       print("sql -> ".$sql."\n");
+       //print("Execute Failure!\n");
+       //print("sql -> ".$sql."\n");
+       throw new PDOException("Excecute Failure! sql -> ".$sql."\n");
      }
    }catch(PDOException $e) {
-     print($e->getMessage());
+     //print($e->getMessage()."\n");
+     print("ha\n\n");
+     throw $e;
    }
  }
  // Clear data file

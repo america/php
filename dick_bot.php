@@ -11,9 +11,6 @@ $consumer_secret;
 $access_token;
 $access_token_secret;
 
-//function getDBInfo() {
-//  return $dbInfo = parse_ini_file("user_info.ini");
-//}
 
 $app_name = "dick_bot";
 
@@ -22,6 +19,7 @@ $logFile = dirname(__FILE__) . "/" . $app_name . ".log";
 if (!($fp = fopen("$logFile", 'a'))) {
       return;
 }
+
 try {
 
   $dbInfo = getDBInfo();
@@ -39,17 +37,11 @@ try {
   $query = $con->prepare($sql);
   $query->execute();
 
-  //foreach($con->query($sql) as $row) {
   foreach($query->fetchAll() as $row) {
-    //print "user                -> " . $row['user'] . "\n";
     $user =  $row['user'];
-    //print "consumer_key        -> " . $row['consumer_key'] . "\n";
     $consumer_key = $row['consumer_key'];
-    //print "consumer_secret     -> " . $row['consumer_secret'] . "\n";
     $consumer_secret = $row['consumer_secret'];
-    //print "access_token        -> " . $row['access_token'] . "\n";
     $access_token =  $row['access_token'];
-    //print "access_token_secret -> " . $row['access_token_secret'] . "\n";
     $access_token_secret = $row['access_token_secret'];
   }
 
@@ -101,16 +93,7 @@ $min = date("i");
       $text = mb_convert_kana(trim($status->text),"rnKHV","utf-8");
 
       $createdAt = $status->created_at;
-      //print("sid -> $sid\n");
-      //print("uid -> $uid\n");
-      //print("screen_name -> $screen_name\n");
-      //print("text -> $text\n");
-      //print("\n");
 
-      //$Bot->Save_data("Tweet","created_ad:$createdAt\n");
-      //$Bot->Save_data("Tweet","sid:$sid\n");
-      //$Bot->Save_data("Tweet","uid:$uid\n");
-      //$Bot->Save_data("Tweet","screen_name:$screen_name\n");
       $creatTime = strtotime($createdAt);
       $Bot->Save_data("tweet_contents", "$sid", "$uid", "$screen_name", "$text", 0, date('Y:m:d H:i:s', $creatTime));
       //$Bot->Save_data("Tweet","\n\n");
@@ -169,17 +152,6 @@ $min = date("i");
       print("\n");
     }
 
-    //$currentDir=`pwd`;
-    //$list="list.dat";
-
-    //set_include_path("$currentDir");
-
-    // ファイルの行をランダムに抽出
-    //$filelist = file("$list", FILE_USE_INCLUDE_PATH);
-    //if( shuffle($filelist) ){
-    //  $message = $filelist[0];
-    //}
-
     $sql = "SELECT CONTENTS
             FROM tweet_list";
 
@@ -195,18 +167,28 @@ $min = date("i");
       //print($message[0]);
     }
     // ツイート
-    $Bot->Post($message[0], $sid);
+    //$Bot->Post($message[0], $sid);
 
+  } catch ( PDOException $e) {
+    print($e->getMessage()."\n");
+
+    writeLog($fp, "Caught Exception -> ".$e);
+    continue;
   } catch ( Exception $e) {
     print($e->getMessage()."\n");
 
-    fprintf($fp, "$e->getMessage()");
+    writeLog($fp, "Caught Exception -> ".$e);
     continue;
   } finally {
     // 最後に呟きのIDを保存して終わり
     //$Bot->End($sid);
 
+    fclose($fp);
   }
 
-  fclose($fp);
+function writeLog($fp, $msg) {
+
+    fprintf($fp, date('Y:m:d H:i:s')."\n");
+    fprintf($fp, "$msg"."\n");
+}
 ?>
