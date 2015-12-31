@@ -18,17 +18,19 @@
     $query = $con->prepare($sql);
     $query->execute();
 
+    $cnt = 0;
     foreach($query->fetchAll() as $row) {
       $no = $row['NO'];
       $content = $row['CONTENTS'];
 
       print("----------"."\n");
-      print("No:"."\n");
-      print($no."\n");
+      print("DB's No: ".$no."\n");;
+      print("Array's No: ".$cnt."\n");;
       print("Content:"."\n");
       print($content."\n");
       print("----------"."\n");
 
+      $cnt++;
     }
 
   } catch(Exception $e) {

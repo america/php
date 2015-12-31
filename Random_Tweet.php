@@ -6,11 +6,15 @@ require_once("Util.php");
 define('TRY_MAX', 10);
 
 $bot = new Ramdom_Bot();
-$bot->main($argv[1]);
+if(count($argv) == 2) {
+  $bot->main($argv[1]);
+} else {
+  $bot->main();
+}
 
 class Ramdom_Bot {
 
-  function main($option) {
+  function main($option = null) {
 
     $con;
     $user;
@@ -54,10 +58,14 @@ class Ramdom_Bot {
 
       $list = Util::getTweetLists();
 
+      $max = count($list);
+
       // latest
       if(strcmp($option, 'last') === 0) {
-        $max = count($list);
         $messages = $list[$max - 1];
+      // specify
+      } else if (ctype_digit($option) && $option < $max) {
+        $messages = $list[$option];
       // random
       } else {
         if( shuffle($list) ){
